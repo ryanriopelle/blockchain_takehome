@@ -6,8 +6,8 @@ from google.cloud import bigquery
 from google.oauth2 import service_account
 
 
-import os
-print(os.environ['PYTHONPATH'].split(os.pathsep))
+# import os
+# print(os.environ['PYTHONPATH'].split(os.pathsep))
 
 CONFIG_FILE = 'conf.yml'
 ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')

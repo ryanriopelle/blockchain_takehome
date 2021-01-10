@@ -1,8 +1,12 @@
 from flask import Flask, request, render_template, Response
 from flask import abort, make_response, jsonify
 import json
+import sys, logging
 
-# from bigquery.util.staging_utils import get_data_from_query
+from bigquery.util.staging_utils import get_data_from_query
+
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 @app.route('/address/exposure/direct',  methods=['GET'])
@@ -48,8 +52,11 @@ def address_exposure_direct():
   }
   return sample_res
 
-# @app.route('/transfers_data',  methods=['GET'])
-# def transfers_data():
-#   results = get_data_from_query()
-#   return Response(json.dumps(results), mimetype='application/json')
+@app.route('/transfers_data',  methods=['GET'])
+def transfers_data():
+  results = get_data_from_query()
+  logger.info(f"results: {results}")
+  return results
 
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')

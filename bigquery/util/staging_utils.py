@@ -107,4 +107,4 @@ def get_data_from_query(sql_file: str = "transfers"):
     encoding = 'utf-8'
     query_text = reformat_query(sql_text.decode(encoding))
     data_res = bq_client.query_to_pandas_dataframe(query_text)
-    print(data_res.to_json(orient='records'))
+    return data_res.to_json(orient='records')
