@@ -15,7 +15,7 @@ class TrmBQClient(object):
 
     def __init__(self, project=None):
         self._cfg = TrmUtilConfig()
-        self._gcp_project = self._cfg.projct_id
+        self._gcp_project = self._cfg.project_id
         self._client = self._cfg.client
         self._file_delimiter = '|'
 
@@ -78,7 +78,7 @@ class TrmBQClient(object):
                   query_params: List = None
                   ):
         if query_params is None:
-            return self._client.query(query_text)
+            return self._client.query(query_text).result()
         else:
             job_config = bigquery.QueryJobConfig
             query_job_params = [bigquery.ScalarQueryParameter(k.get('name'),
@@ -87,7 +87,7 @@ class TrmBQClient(object):
             job_config.query_parameters = query_job_params
             return self._client.query(query_text,
                                       location='US',
-                                      job_config=job_config)
+                                      job_config=job_config).result()
 
     def query_to_pandas_dataframe(self,
                                   query_text: str,
@@ -128,10 +128,11 @@ class TrmBQClient(object):
         :param query_params list of dicts with query params
         :return: None
         """
-
+        print("Running query to localfile")
         try:
             df = self.query_to_pandas_dataframe(query_text, query_params)
             df.to_csv(target_file_name, sep=colsep, index=False, header=header)
+            logging.info("saved file to csv")
         except IOError:
             import traceback
             logging.error(traceback.format_exc())
@@ -163,7 +164,7 @@ class TrmBQClient(object):
 
         os.remove(temp_file_name)
 
-    def list_tables_in_dataset(self, dataset_name: str = 'data_science_staging') -> list:
+    def list_tables_in_dataset(self, dataset_name: str = 'trm_sample_data') -> list:
         """
         list all tables in a dataset -- use to create list of tables to load
         :param dataset_name:

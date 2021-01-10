@@ -1,12 +1,13 @@
 import pkgutil
 
-from google.cloud import bigquery
-from google.cloud.bigquery import job as bq_job
-from google.cloud.exceptions import Conflict
+# from google.cloud import bigquery
+# from google.cloud.bigquery import job as bq_job
+# from google.cloud.exceptions import Conflict
+from bigquery.clients.bigquery_client import TrmBQClient
 
 import os
 
-client = bigquery.Client()
+# client = bigquery.Client()
 
 
 def init_env(env, creds_path):
@@ -61,25 +62,7 @@ def drop_table(dataset_name, table_name):
     client.delete_table(table)
 
 
-def make_initial_staging_table(query_string, dataset_name, table_name):
-    """
-    make first stage table
-    :param query_string:
-    :param dataset_name:
-    :param table_name:
-    :return:
-    """
-    config = bq_job.QueryJobConfig()
-    config.write_disposition = 'WRITE_TRUNCATE'
-    dataset_ref = client.dataset(dataset_name)
-    table_ref = dataset_ref.table(table_name)
-    config.destination = table_ref
-    load_job = client.query(query_string, config)
-    load_job.result()
-    print("loaded {} rows".format(load_job.num_dml_affected_rows))
-
-
-def reformat_query(query_string, dataset_name, env_name='trm-production'):
+def reformat_query(query_string, dataset_name ='crypto_bitcoin', env_name='trm-production'):
     """
     helper -- replace placeholder strings
     :param query_string:
@@ -89,29 +72,9 @@ def reformat_query(query_string, dataset_name, env_name='trm-production'):
     """
     import os
     environment_name = '-'.join(['trm', os.environ.get('ENVIRONMENT', 'production')])
-
     return query_string.replace('XXXPROJECTNAMEXXX', environment_name)\
         .replace('XXXSTAGINGDATASETXXX', dataset_name)\
         .replace('XXXRPTSTGXXX', 'rpt_staging')
-
-
-def append_table(query_text, source_dataset_name, table_name, target_dataset_name='bigquery-public-data'):
-    """
-
-    :param query_text:
-    :param dataset_name:
-    :param table_name:
-    :return:
-    """
-    config = bq_job.QueryJobConfig()
-    config.write_disposition = 'WRITE_APPEND'
-    dataset_ref = client.dataset(target_dataset_name)
-    table_ref = dataset_ref.table(table_name)
-    config.destination = table_ref
-    print('target = {}'.format(config.destination))
-    query_string = reformat_query(query_text, source_dataset_name)
-    load_job = client.query(query_string, config)
-    return load_job
 
 
 def local_csv_to_bq(filepath, dataset_name, table_name, write_dispo='WRITE_TRUNCATE', file_delim=',', schema=None):
@@ -135,3 +98,13 @@ def local_csv_to_bq(filepath, dataset_name, table_name, write_dispo='WRITE_TRUNC
             job_config=job_config)  # API request
     job.result()  # Waits for table load to complete.
     print('Loaded {} rows into {}:{}.'.format(job.output_rows, dataset_name, table_name))
+
+
+def get_data_from_query(sql_file: str = "transfers"):
+
+    bq_client = TrmBQClient()
+    sql_text = get_sql_from_file(sql_file)
+    encoding = 'utf-8'
+    query_text = reformat_query(sql_text.decode(encoding))
+    data_res = bq_client.query_to_pandas_dataframe(query_text)
+    print(data_res.to_json(orient='records'))
