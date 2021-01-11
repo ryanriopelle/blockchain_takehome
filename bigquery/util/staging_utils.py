@@ -102,14 +102,35 @@ def local_csv_to_bq(filepath, dataset_name, table_name, write_dispo='WRITE_TRUNC
 
 def get_data_from_query(sql_file: str = "transfers"):
 
+    if sql_file == "direct_exposure":
+        query_text = get_direct_exposure_query(address)
+    elif sql_file == "top_n_addresses":
+        query_text = get_top_n_addresses_query(address)
+    else:
+        sql_text = get_sql_from_file(sql_file)
+        encoding = 'utf-8'
+        query_text = reformat_query(sql_text.decode(encoding))
+
     bq_client = TrmBQClient()
-    sql_text = get_sql_from_file(sql_file)
-    encoding = 'utf-8'
-    query_text = reformat_query(sql_text.decode(encoding))
     data_res = bq_client.query_to_pandas_dataframe(query_text)
     return data_res.to_json(orient='records')
 
-def get_direct_exposure_query(sql_file, address):
+def get_direct_exposure_query(address):
+    """
+    helper -- replace placeholder strings
+    :param address: in format "34R3Bb2HErwvioRFa88HPVxBxx1SpAMeyd"
+    :return:
+    """
+    sql_file: str = "direct_exposure"
+    sql_text = get_sql_from_file(sql_file)
+    encoding = 'utf-8'
+    query_text = reformat_query(sql_text.decode(encoding))
+    return query_text.replace('<ADDRESS>', address)
+
+
+def get_top_n_addresses_query(address, top_n, flow_type,
+                              start_date, end_date):
+
     """
     helper -- replace placeholder strings
     :param query_string:
@@ -117,22 +138,10 @@ def get_direct_exposure_query(sql_file, address):
     :param env_name:
     :return:
     """
+    sql_file: str = "top_n_addresses"
     sql_text = get_sql_from_file(sql_file)
     encoding = 'utf-8'
     query_text = reformat_query(sql_text.decode(encoding))
-    return query_text.replace('<ADDRESS>', address)
-
-
-def get_top_n_addresses_query(sql_file, address):
-
-    """
-    helper -- replace placeholder strings
-    :param query_string:
-    :param dataset_name:
-    :param env_name:
-    :return:
-    """
-    sql_text = get_sql_from_file(sql_file)
-    encoding = 'utf-8'
-    query_text = reformat_query(sql_text.decode(encoding))
-    return query_text.replace('<ADDRESS>', address)
+    top_n = str(top_n)
+    return query_text.replace('<ADDRESS>', address).replace('<TOP_N>', top_n).replace('<FLOW_TYPE>',flow_type).\
+                      replace('<START_DATE>', start_date).replace('<END_DATE>', end_date)
