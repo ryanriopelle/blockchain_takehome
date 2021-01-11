@@ -1,9 +1,9 @@
 -- Answer 1
 SELECT
-  Distinct
   sender,
   receiver,
   SUM(value) OVER (PARTITION BY sender, receiver) AS total_value,
+  block_timestamp
 FROM
 (SELECT
   "btc" AS chain,
@@ -20,5 +20,5 @@ FROM
   UNNEST(outputs) AS output,
   UNNEST(output.addresses) AS output_address
 WHERE
-  -- Using partition column to reduce dataset size
-  block_timestamp_month = DATE_TRUNC(CURRENT_DATE() , MONTH))
+  (input_address = "<ADDRESS>" or output_address = "<ADDRESS>") AND
+  block_timestamp_month = DATE_TRUNC(CURRENT_DATE() , MONTH)

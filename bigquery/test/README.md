@@ -20,7 +20,8 @@ curl --request GET \
 
 Example Response Should Look Like This
 
-```[
+```json
+[
   {
     "chain": "btc",
     "block_timestamp": 1609994001000,
@@ -43,6 +44,38 @@ Example Response Should Look Like This
 
 **2. Part 1: Calculate the Direct Exposure between addresses.**
 Can send the following request to get the solution.
+
+```json
+  {
+    "sender": "bc1qjw7lndf3hkr0zv9f7jf9zvhtvgmd9a3nsqujn2",
+    "receiver": "bc1qer4sjwuzk785shud7mpvm0gsv2nn7lfjcs3lc5",
+    "total_value": 22.73112338
+  },
+  {
+    "sender": "bc1qk0fqd2ysrlmq9u2qjvcghmuhpr6300eusa84dt",
+    "receiver": "3FDK59RY66QePsqkdKXQMgTT73V6wYkG52",
+    "total_value": 103.09187091
+  }, ...
+
+```
+
+```json
+{ 
+	"data": [
+		{
+			"counterparty_address": "",
+			"inflows": "",
+			"outflows": "",
+			"total_flows": ""
+		}
+	],
+	"success": true
+}
+```
+
+**3. Part 2: Calculate the Top N addresses with flows.**
+Can send the following request to get the solution.
+
 
 
 

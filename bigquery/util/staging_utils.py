@@ -108,3 +108,31 @@ def get_data_from_query(sql_file: str = "transfers"):
     query_text = reformat_query(sql_text.decode(encoding))
     data_res = bq_client.query_to_pandas_dataframe(query_text)
     return data_res.to_json(orient='records')
+
+def get_direct_exposure_query(sql_file, address):
+    """
+    helper -- replace placeholder strings
+    :param query_string:
+    :param dataset_name:
+    :param env_name:
+    :return:
+    """
+    sql_text = get_sql_from_file(sql_file)
+    encoding = 'utf-8'
+    query_text = reformat_query(sql_text.decode(encoding))
+    return query_text.replace('<ADDRESS>', address)
+
+
+def get_top_n_addresses_query(sql_file, address):
+
+    """
+    helper -- replace placeholder strings
+    :param query_string:
+    :param dataset_name:
+    :param env_name:
+    :return:
+    """
+    sql_text = get_sql_from_file(sql_file)
+    encoding = 'utf-8'
+    query_text = reformat_query(sql_text.decode(encoding))
+    return query_text.replace('<ADDRESS>', address)
