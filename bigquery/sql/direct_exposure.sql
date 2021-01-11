@@ -21,4 +21,5 @@ FROM
   UNNEST(output.addresses) AS output_address
 WHERE
   (input_address = "<ADDRESS>" or output_address = "<ADDRESS>") AND
-  block_timestamp_month = DATE_TRUNC(CURRENT_DATE() , MONTH)
+  block_timestamp_month = DATE_TRUNC(CURRENT_DATE() , MONTH))
+limit <LIMIT>
