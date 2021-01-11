@@ -1,13 +1,8 @@
 import pkgutil
-
-# from google.cloud import bigquery
-# from google.cloud.bigquery import job as bq_job
-# from google.cloud.exceptions import Conflict
-from bigquery.clients.bigquery_client import TrmBQClient
-
+import json
 import os
 
-# client = bigquery.Client()
+from bigquery.clients.bigquery_client import TrmBQClient
 
 
 def init_env(env, creds_path):
@@ -146,5 +141,11 @@ def get_top_n_addresses_query(address, top_n, flow_type,
 def get_data_from_query(query_text):
 
     bq_client = TrmBQClient()
-    data_res = bq_client.query_to_pandas_dataframe(query_text)
-    return data_res.to_json(orient='records')
+    data_res = bq_client.query_to_pandas_dataframe(query_text).to_json(orient='records')
+    print(data_res)
+    res = {
+        "data": json.loads(data_res),
+        "success": True
+    }
+    print(res)
+    return res
