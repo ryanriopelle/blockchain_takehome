@@ -238,7 +238,9 @@ Example Response
     * UNIT TESTING - I did a limited amount of unit testing for various functions. 
         - Those functions can be found in this file "<project_root>/bigquery/test/test_client.py"
         - NOTE: other potential examples here for loading and other testing. "<project_root>/bigquery/test/test_other_examples.py"
-    * SPEED REQUIREMENTS - I am getting a response time between 1-3 second, any latency is probably do to big query limitations.
+    * SPEED REQUIREMENTS - 
+        - Please Note: In big query UI response time is sub 1 second! 
+        - Combined with API I am getting 1-3 seconds with middle layer, any latency due to big query limitation, networking, additional code. 
         - Ways to improve response time. 
             1. Add predicate pushdowns higher up query stack in query to improve filtering.
             2. Build a materialized table or view so queries dont have to be run each time.
