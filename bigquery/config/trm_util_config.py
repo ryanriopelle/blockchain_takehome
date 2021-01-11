@@ -23,16 +23,3 @@ class TrmUtilConfig(object):
         self.credentials = service_account.Credentials.from_service_account_file(self.cred_file)
         self.project_id = 'trm-takehome-ryan-r'
         self.client = bigquery.Client(credentials=self.credentials, project=self.project_id)
-
-
-
-        # if conf_file is None:
-        #     self._conf_file_name = CONFIG_FILE
-        # else:
-        #     self._conf_file_name = conf_file
-        # # ymlfile = pkgutil.get_data('data_util.config', self.conf_file_name)
-        # ymlfile = open(self.conf_file_name, 'r')
-        # print(ymlfile, type(ymlfile))
-        # cfg_all = yaml.load(ymlfile, Loader=yaml.UnsafeLoader)
-        # self.cfg = cfg_all.get(self.ENVIRONMENT)
-        # self.GCP_PROJECT = f'trm-{self.ENVIRONMENT}'

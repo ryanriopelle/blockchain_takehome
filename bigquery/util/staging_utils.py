@@ -1,9 +1,12 @@
 import pkgutil
 import json
 import os
+import sys, logging
 
 from bigquery.clients.bigquery_client import TrmBQClient
 
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def init_env(env, creds_path):
     """
@@ -68,8 +71,7 @@ def reformat_query(query_string, dataset_name ='crypto_bitcoin', env_name='trm-p
     import os
     environment_name = '-'.join(['trm', os.environ.get('ENVIRONMENT', 'production')])
     return query_string.replace('XXXPROJECTNAMEXXX', environment_name)\
-        .replace('XXXSTAGINGDATASETXXX', dataset_name)\
-        .replace('XXXRPTSTGXXX', 'rpt_staging')
+        .replace('XXXSTAGINGDATASETXXX', dataset_name)
 
 
 def local_csv_to_bq(filepath, dataset_name, table_name, write_dispo='WRITE_TRUNCATE', file_delim=',', schema=None):
@@ -102,8 +104,13 @@ def run_query_for_file(sql_file: str = "transfers"):
     query_text = reformat_query(sql_text.decode(encoding))
 
     bq_client = TrmBQClient()
-    data_res = bq_client.query_to_pandas_dataframe(query_text)
-    return data_res.to_json(orient='records')
+    data_res = bq_client.query_to_pandas_dataframe(query_text).to_json(orient='records')
+    res = {
+        "data": json.loads(data_res),
+        "success": True
+    }
+    logger.info(res)
+    return res
 
 
 def get_direct_exposure_query(address, limit):
@@ -147,5 +154,5 @@ def get_data_from_query(query_text):
         "data": json.loads(data_res),
         "success": True
     }
-    print(res)
+    logger.info(res)
     return res
