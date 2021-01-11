@@ -1,4 +1,4 @@
-agg_query_columns = {
+query_schemas = {
     'base_query': [['chain', 'STRING'],
                     ['block_timestamp', 'TIMESTAMP'],
                     ['block_hash', 'STRING'],

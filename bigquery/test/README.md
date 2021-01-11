@@ -84,7 +84,7 @@ curl --request GET \
 ## Answers to Problems
 
 
-** Part 1. Calculate the Direct Exposure between addresses.**
+**Part 1. Calculate the Direct Exposure between addresses.**
 Can send the following request to get the solution.
 
 Curl Request With Parameters
@@ -136,7 +136,7 @@ Example Response
 ```
 
 
-** Part 2: Calculate the Top N addresses with flows.**
+**Part 2: Calculate the Top N addresses with flows.**
 Can send the following request to get the solution.
 
 
@@ -203,3 +203,46 @@ Example Response
   "success": true
 }
 ```
+
+**Part 3: Design the API which has examples above, additional questions discussed below.**
+
+- What data *store* would you use to store the data? 
+    * PLEASE SEE "<project_root>/bigquery/clients/bigquery_client.py"
+    * The data response is in json format. 
+    * I used a pandas data frame for simple manipulation upstream of the API, and for any ML that could be added mid stream. 
+    * I provided other add ons to the client for storing data as a CSV, listing tables in database, generally querying to local file, 
+      getting schemas from bigquery, listing a single column as a result.
+    * (The preferred delimiter on files would be a pipe. i.e. "|" )
+    * I also have more functions from previous jobs for storing to GCS, querying using spark, ect.
+- What data *schema* would you use?
+    * PLEASE SEE "<project_root>/bigquery/reporting_sql.py" for schemas
+    * If we wanted to store a schema outside of big query I provided a file for doing so, 
+      this could be used for things like spark or conerting to other databases.  
+    * You can retrieve big query schemas from big query if you would like by using the client add ons as well.
+- How would you *load* the data?
+    * You can load the data in a similiar way to retrieving the data with the bigquery client, I have personal functions for that
+    but you would have to hire me to get those :)
+- How would you *update* the data?
+    * You can update the data by UPDATE and INSERT (upserting not specifically supported) to big query along with 
+      bigquery loads functions described in the last section. 
+    * I also have functions for these on my local but did not include them here.
+- How would it *scale* to larger data sizes? (ie., multi-terabyte)
+    * For larger scale processing you could use Spark to either parrallize processing with dataproc.
+    * I have funcitons for this too. 
+    * Dataproc specifications can be set using airflow and set to scale dynamically.
+- Other considerations?
+    * UNIT TESTING - I did a limited amount of unit testing for various functions. 
+        - Those functions can be found in this file "<project_root>/bigquery/test/test_client.py"
+        - NOTE: other potential examples here for loading and other testing. "<project_root>/bigquery/test/test_other_examples.py"
+    * SPEED REQUIREMENTS - I am getting a response time between 1-3 second, any latency is probably do to big query limitations.
+        - Ways to improve response time. 
+            1. Add predicate pushdowns higher up query stack in query to improve filtering.
+            2. Build a materialized table or view so queries dont have to be run each time.
+            3. Limit the tables overall size based on time so reduce searching. 
+            3. Use Timeit to check if any python code is slow, optimize things like try, accept statements which can be slow.
+            4. Add a caching layer with python cache or redis for distributed cache on kubernetes.
+            5. For multiple requests at once can use pythons multiprocessing, now in 3.8 new improvements for multithreading around the GIL.
+            6. Try a different database: possibly elastic search, relational db, or anything else.
+            7. Possible use cpython, not sure if this would help   
+    * 
+        

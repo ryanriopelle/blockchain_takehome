@@ -81,7 +81,7 @@ class TestBQClient(object):
     def test_query_load_job_to_self_table(self, test_bq_client):
         """
         run with:
-        pytest test_bq_client.py::TestBQClient::test_query_load_job_to_self_table -s
+        pytest test_other_examples.py::TestBQClient::test_query_load_job_to_self_table -s
         note that the -s flag prints outputs
 
         """
