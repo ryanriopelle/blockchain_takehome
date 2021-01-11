@@ -2,11 +2,15 @@
 
 This repo can be used to test queries. 
 
+1. PLEASE SEE BOTTOM OF PAGE FOR WRITEUP
+2. ADD BIG QUERY JSON SECRET CREDS HERE :  "bigquery/config/trm_util_config.py"
+    * ADD CREDENTIALS ON LINE 23
+
 A few things to note:
 - SQL Queries and solutions can be found under bigquery/SQL
 - The three queries include the original, top_n_addresses answer, and direct_exposure answer.
-- You can run the flask app by using the instructions on the README from home folder.
-- The results are pesented as json format, the schemas for the results can be found under the reporting.sql file.
+- You can run the flask app by using the instructions on the README from home folder and examples below.
+- The results are presented as json format, the schemas for the results can be found under the reporting.sql file.
 
 ## Test Queries
 

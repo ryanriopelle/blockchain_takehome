@@ -29,6 +29,7 @@ FROM
        ELSE SENDER
        END AS counterparty_address,
   SUM(value) OVER (PARTITION BY sender, receiver) AS total_value,
+  block_timestamp_month
 FROM
 (SELECT
   "btc" AS chain,
@@ -38,6 +39,7 @@ FROM
   output_address AS receiver,
   -- Adjust value for decimals. Bitcoin has 10**8 decimals
   SAFE_DIVIDE(LEAST(input_value, output_value), POW(10, 8)) AS value,
+  block_timestamp_month
 FROM
   `bigquery-public-data.crypto_bitcoin.transactions`,
   UNNEST(inputs) AS input,
@@ -46,10 +48,10 @@ FROM
   UNNEST(output.addresses) AS output_address
 WHERE
 block_timestamp_month = DATE_TRUNC(CURRENT_DATE() , MONTH))
-WHERE sender = '<ADDRESS>' or receiver = '<ADDRESS>'
+WHERE block_timestamp_month >= DATE_TRUNC(DATE "<START_DATE>", MONTH)
+AND block_timestamp_month <= DATE_TRUNC(DATE "<END_DATE>", MONTH)
+AND sender = '<ADDRESS>' or receiver = '<ADDRESS>'
 AND sender != receiver
-AND TIMESTAMP(DATETIME "<START_DATE> 00:00:00") < block_timestamp
-AND TIMESTAMP(DATETIME "<END_DATE> 00:00:00") > block_timestamp
 ))
 group by counterparty_address
 order by total_flow desc
