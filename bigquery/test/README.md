@@ -243,6 +243,32 @@ Example Response
             4. Add a caching layer with python cache or redis for distributed cache on kubernetes.
             5. For multiple requests at once can use pythons multiprocessing, now in 3.8 new improvements for multithreading around the GIL.
             6. Try a different database: possibly elastic search, relational db, or anything else.
-            7. Possible use cpython, not sure if this would help   
-    * 
+            7. Possible use cpython, not sure if this would help
+               
+- Data Accuracy?  
+    * I wrote both queries two ways, using the UI the data lined up for the most part before I added variable substituion.
+    * You could also go through and test for specific usernames and double spot check the data.
+    * Note : I did notice I saw a bunch of people paying themselves which was a little weird, not sure if this is acceptable.
+    * I assumed total flow meant adding in + out flow.
+    * Added the option to filter by outflow, versus inflow, both, or all/any
+
+- Other Notes - Configuration Files: 
+    * Configuration files can be found at "<root>/bigquery/config/trm_config.py" and "<root>/bigquery/config/trm_util_config.py"
+    * Sorry, I hardcoded the location of the JSON secret file. 
+    * Also have an oauth test in the "<root>/bigquery/test/test_oauth_creds.py". 
+    * I will send the secret to you as well so you can run this all yourself if you would like. 
+      
+**Thanks for reviewing!!!  :)**
         
+````
+             ,-. 
+    ,     ,-.   ,-. 
+   / \   (   )-(   ) 
+   \ |  ,.>-(   )-< 
+    \|,' (   )-(   ) 
+     Y ___`-'   `-' 
+     |/__/   `-' 
+     | 
+     | 
+     |    -RR- 
+  ___|_____________ 
