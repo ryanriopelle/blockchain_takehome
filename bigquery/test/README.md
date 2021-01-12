@@ -211,6 +211,21 @@ Example Response
 **Part 3: Design the API which has examples above, additional questions discussed below.**
 
 - What data *store* would you use to store the data? 
+   * I used BigQuery here because that's where the original data lived and it enabled me to build the sample without copying data.
+     The final datastore choice would depend on a few things.  
+     If <= 1 sec responses is good enough --  you could keep it in BigQuery with a few changes to the schema. (see performance section below for the changes)
+    If performance is good enough, this offers several advantages:
+        1. leaving it in BigQuery removes overhead of additional datastore configuration, scaling, and administration.  
+        2. A batch job can easily pull new records from the public dataset into the target copy
+        3. BigQuery bills for i/o, so reducing reads also optimizes costs.
+    This setup would likely get you responses in under a second but not millisecond response time, since BQ's not really made for this use case.  If that isn't fast enough, the best datastore choice would depend on how you expect it to be accessed.  For example:
+        - If you expect filtering largely on the senders/receivers with large date ranges, 
+          you could use something like elasticsearch with indexes on the addresses. Or you could use a key/value store (ie google cloud datastore.
+        - If you expect narrow date range queries, a traditional RDBMS (postgres/mysql) 
+          with partitions by date and indexes on sender/receiver would perform fine.
+        - If you expect to broaden the api to track all relationships between senders/receivers, you could use a graph database.
+        Any of these other options would require a separate load job or export job to get new records from 
+          the BigQuery source, and most would require care and feeding.   
     * PLEASE SEE "<project_root>/bigquery/clients/bigquery_client.py"
     * The data response is in json format. 
     * I used a pandas data frame for simple manipulation upstream of the API, and for any ML that could be added mid stream. 
@@ -224,6 +239,9 @@ Example Response
       this could be used for things like spark or conerting to other databases.  
     * You can retrieve big query schemas from big query if you would like by using the client add ons as well.
 - How would you *load* the data?
+    * You could do a Cloud Function that would do incremental loads into your BQ table when new data arrived in the source BQ table.  
+      Or export new records to cloud storage for load into your alternative datastore if you use something else.
+    * Or you could set a pub/sub event on new row arrival.
     * You can load the data in a similiar way to retrieving the data with the bigquery client, I have personal functions for that
     but you would have to hire me to get those :)
 - How would you *update* the data?
@@ -239,9 +257,12 @@ Example Response
         - Those functions can be found in this file "<project_root>/bigquery/test/test_client.py"
         - NOTE: other potential examples here for loading and other testing. "<project_root>/bigquery/test/test_other_examples.py"
     * SPEED REQUIREMENTS - 
+      With a few changes to the schema, you could keep it in BigQuery.  You could get sub-second responses from BigQuery by creating a copy of the table that does the following:
+            1. Unnest the input/output addresses so that the table has just the transaction data you need (timestamp, timestamp month, input & output addresses, and value)
+            2. Maintain the date partitioning and add cluster-by columns of input and output address.  This will enable faster searching by address and date.
         - Please Note: In big query UI response time is sub 1 second! 
         - Combined with API I am getting 1-3 seconds with middle layer, any latency due to big query limitation, networking, additional code. 
-        - Ways to improve response time. 
+        - Other ways to improve response time. 
             1. Add predicate pushdowns higher up query stack in query to improve filtering.
             2. Build a materialized table or view so queries dont have to be run each time.
             3. Limit the tables overall size based on time so reduce searching. 
@@ -263,6 +284,7 @@ Example Response
     * Sorry, I hardcoded the location of the JSON secret file. 
     * Also have an oauth test in the "<root>/bigquery/test/test_oauth_creds.py". 
     * I will send the secret to you as well so you can run this all yourself if you would like. 
+    * I added  - from mock import patch - to show how to mock data for unit tests.
       
 **Thanks for reviewing!!!  :)**
         
