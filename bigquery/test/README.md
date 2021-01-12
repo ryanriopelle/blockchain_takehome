@@ -284,6 +284,7 @@ Example Response
     * Sorry, I hardcoded the location of the JSON secret file. 
     * Also have an oauth test in the "<root>/bigquery/test/test_oauth_creds.py". 
     * I will send the secret to you as well so you can run this all yourself if you would like. 
+    * I added  - from mock import patch - to show how to mock data for unit tests.
       
 **Thanks for reviewing!!!  :)**
         

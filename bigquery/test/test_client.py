@@ -1,5 +1,5 @@
 from unittest import TestCase
-
+from mock import patch
 from bigquery.util.staging_utils import get_direct_exposure_query, get_top_n_addresses_query, get_data_from_query
 
 class TestConfig(TestCase):
@@ -22,8 +22,8 @@ class TestConfig(TestCase):
         self.assertTrue('DATE_TRUNC(DATE "2021-01-01", MONTH)' in top_n_addresses_query)
         self.assertTrue('TIMESTAMP(DATETIME "2021-01-01 00:00:00")' in top_n_addresses_query)
 
-
-    def test_get_data_from_query(self):
+    @patch('bigquery.util.staging_utils.get_data_from_query')
+    def test_get_data_from_query(self, get_data_from_query):
 
         query_text = """
             SELECT counterparty_address, inflow, outflow, total_flow, flow_type
@@ -89,6 +89,14 @@ class TestConfig(TestCase):
             WHERE flow_type in ('outflow','inflow','both')
         """
 
+        get_data_from_query.return_value = {'data': [{'counterparty_address': '3EcyY4Qk4HXiMFGktR1XG1T4hs5zyGKb6c',
+                                      'inflow': 0.0, 'outflow': 1.25578385, 'total_flow': 1.25578385, 'flow_type': 'outflow'},
+                                     {'counterparty_address': '1A9V3MPSf3oovdZ1AwzdJLX6Bz7DnG6KsG',
+                                      'inflow': 0.0, 'outflow': 1.25578385, 'total_flow': 1.25578385, 'flow_type': 'outflow'},
+                                     {'counterparty_address': '1MWKZvhbYzL4s94JcDPAzdiwoEEb5xzXxL',
+                                      'inflow': 0.0, 'outflow': 1.25578385, 'total_flow': 1.25578385, 'flow_type': 'outflow'}],
+                            'success': True}
+
         data_result = get_data_from_query(query_text)
         # This result actually changes over time so it wont be consistent
         # Just showing this as an example, I could use PyMock to mock the result.
@@ -100,3 +108,4 @@ class TestConfig(TestCase):
                                       'inflow': 0.0, 'outflow': 1.25578385, 'total_flow': 1.25578385, 'flow_type': 'outflow'}],
                             'success': True}
         self.assertEqual(type(data_result), dict)
+        self.assertEqual(expected_result, data_result)
