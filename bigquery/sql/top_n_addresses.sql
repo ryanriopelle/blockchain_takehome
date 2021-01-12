@@ -46,11 +46,14 @@ FROM
   UNNEST(input.addresses) AS input_address,
   UNNEST(outputs) AS output,
   UNNEST(output.addresses) AS output_address
-WHERE
-block_timestamp_month = DATE_TRUNC(CURRENT_DATE() , MONTH))
-WHERE block_timestamp_month >= DATE_TRUNC(DATE "<START_DATE>", MONTH)
-AND block_timestamp_month <= DATE_TRUNC(DATE "<END_DATE>", MONTH)
-AND sender = '<ADDRESS>' or receiver = '<ADDRESS>'
+WHERE block_timestamp_month between
+  DATE_TRUNC(DATE "<START_DATE>", MONTH)
+  AND DATE_TRUNC(DATE "<END_DATE>", MONTH)
+AND block_timestamp between
+  TIMESTAMP(DATETIME "<START_DATE> 00:00:00")
+  AND TIMESTAMP(DATETIME "<END_DATE> 00:00:00")
+ ) WHERE
+sender = '<ADDRESS>' or receiver = '<ADDRESS>'
 AND sender != receiver
 ))
 group by counterparty_address
